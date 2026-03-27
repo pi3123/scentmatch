@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Fragrance {
+  id           Int              @id @default(autoincrement())
+  name         String
+  brand        String
+  year         Int?
+  gender       String?
+  ratingValue  Float?           @map("rating_value")
+  ratingCount  Int?             @map("rating_count")
+  mainAccords  Json?            @map("main_accords")
+  longevity    Json?            @map("longevity_votes")
+  sillage      Json?            @map("sillage_votes")
+  imageUrl     String?          @map("image_url")
+  notes        FragranceNote[]
+  collections  UserCollection[]
+
+  @@map("fragrances")
+}
+
+model Note {
+  id         Int             @id @default(autoincrement())
+  name       String          @unique
+  category   String?
+  fragrances FragranceNote[]
+  preferences NotePreference[]
+
+  @@map("notes")
+}
+
+model FragranceNote {
+  fragranceId Int       @map("fragrance_id")
+  noteId      Int       @map("note_id")
+  layer       String
+  fragrance   Fragrance @relation(fields: [fragranceId], references: [id])
+  note        Note      @relation(fields: [noteId], references: [id])
+
+  @@id([fragranceId, noteId])
+  @@map("fragrance_notes")
+}
+
+model User {
+  id            String           @id @default(cuid())
+  email         String           @unique
+  name          String?
+  image         String?
+  preferredTone String           @default("casual") @map("preferred_tone")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  accounts      Account[]
+  sessions      Session[]
+  collection    UserCollection[]
+  preferences   NotePreference[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model UserCollection {
+  userId      String    @map("user_id")
+  fragranceId Int       @map("fragrance_id")
+  status      String
+  rating      Int?
+  addedAt     DateTime  @default(now()) @map("added_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fragrance   Fragrance @relation(fields: [fragranceId], references: [id])
+
+  @@id([userId, fragranceId])
+  @@map("user_collection")
+}
+
+model NotePreference {
+  userId     String @map("user_id")
+  noteId     Int    @map("note_id")
+  preference String
+  source     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note       Note   @relation(fields: [noteId], references: [id])
+
+  @@id([userId, noteId])
+  @@map("note_preferences")
+}
