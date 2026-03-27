@@ -1,48 +1,64 @@
 @import "tailwindcss";
 
 @theme inline {
+  /* New palette */
   --color-cream-50: #faf8f5;
-  --color-cream-100: #f5f0e8;
-  --color-cream-200: #ebe3d5;
-  --color-cream-300: #ddd1bb;
+  --color-cream-100: #f0ece4;
+  --color-cream-200: #e2d8c8;
+  --color-brown: #1e1812;
+  --color-brown-mid: #6b5a45;
+  --color-brown-light: #a69279;
+  --color-sage: #6b8060;
+  --color-rose: #b8605a;
+  --color-amber: #c4973e;
+
+  /* Backward-compat aliases (old name → new value) */
+  --color-cream-300: #e2d8c8;
   --color-cream-400: #c9b898;
   --color-cream-500: #b5a07a;
-  --color-warm-600: #8b7355;
-  --color-warm-700: #6b5840;
-  --color-warm-800: #4a3d2e;
-  --color-warm-900: #2d2519;
-
+  --color-warm-600: #a69279;
+  --color-warm-700: #6b5a45;
+  --color-warm-800: #1e1812;
+  --color-warm-900: #1e1812;
   --color-sage-400: #8faa7e;
-  --color-sage-500: #6d8f5e;
+  --color-sage-500: #6b8060;
   --color-sage-600: #567347;
-
   --color-rose-400: #d4868a;
-  --color-rose-500: #c06268;
-
+  --color-rose-500: #b8605a;
   --color-sky-400: #7db3c9;
   --color-sky-500: #5a9ab5;
-
   --color-amber-400: #e8b94e;
-  --color-amber-500: #d4a235;
+  --color-amber-500: #c4973e;
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Inter", -apple-system, sans-serif;
 }
 
+/* Cormorant Garamond — normal 400-600 */
 @font-face {
-  font-family: "Playfair Display";
+  font-family: "Cormorant Garamond";
   font-style: normal;
-  font-weight: 400 900;
+  font-weight: 400 600;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDTbtPY_Q.woff2") format("woff2");
+  src: url("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3bmX5slCNuHLi8bLeY9MK7whWMhyjornFLsS6V7w.woff2") format("woff2");
 }
 
+/* Cormorant Garamond — italic 400-500 */
 @font-face {
-  font-family: "DM Sans";
-  font-style: normal;
-  font-weight: 300 700;
+  font-family: "Cormorant Garamond";
+  font-style: italic;
+  font-weight: 400 500;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxhS23PjQ.woff2") format("woff2");
+  src: url("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtJmyW1xw.woff2") format("woff2");
+}
+
+/* Inter — 300-600 */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2") format("woff2");
 }
 
 * {
@@ -51,15 +67,17 @@
 
 body {
   background: var(--color-cream-50);
-  color: var(--color-warm-800);
+  color: var(--color-brown);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--color-cream-300);
-  color: var(--color-warm-900);
+  background: var(--color-cream-200);
+  color: var(--color-brown);
 }
+
+/* ---- Existing animations (keep) ---- */
 
 /* Score ring animation */
 @keyframes score-fill {
@@ -91,3 +109,38 @@ body {
 .stagger-children > *:nth-child(3) { animation-delay: 120ms; }
 .stagger-children > *:nth-child(4) { animation-delay: 180ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+
+/* ---- New animations ---- */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bottleUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scoreIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 6px 24px rgba(0,0,0,0.2); }
+  50% { box-shadow: 0 6px 32px rgba(196,151,62,0.2); }
+}
+
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* New utility classes */
+.blend { mix-blend-mode: multiply; }
+.animate-fadeUp { animation: fadeUp 0.7s ease forwards; }
+.animate-bottleUp { animation: bottleUp 0.9s ease forwards; }
+.animate-scoreIn { animation: scoreIn 0.6s ease forwards; }
+.animate-pulseGlow { animation: pulseGlow 3s infinite; }
+.animate-barGrow { animation: barGrow 1.2s ease forwards; transform-origin: left; }
