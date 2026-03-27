@@ -3,3 +3,6 @@ node_modules/
 .env
 .env.local
 .superpowers/
+engine/venv/
+__pycache__/
+*.pyc
