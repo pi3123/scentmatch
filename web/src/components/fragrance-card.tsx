@@ -70,7 +70,7 @@ export function FragranceCard({
           <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.125em] text-brown-mid">
             {item.status}
           </p>
-          <p className="font-display text-[22px] font-medium text-brown">{f.name}</p>
+          <p className="font-heading text-[22px] font-medium text-brown">{f.name}</p>
           <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.125em] text-brown-mid">
             {f.brand}
           </p>
@@ -127,7 +127,7 @@ export function FragranceCard({
         <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.125em] text-brown-mid">
           {item.status}
         </p>
-        <p className="font-display text-[17px] font-medium text-brown">{f.name}</p>
+        <p className="font-heading text-[17px] font-medium text-brown">{f.name}</p>
         <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.125em] text-brown-mid">
           {f.brand}
         </p>

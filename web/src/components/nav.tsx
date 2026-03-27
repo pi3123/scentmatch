@@ -28,7 +28,7 @@ export function Nav() {
       <div className="flex h-full items-center justify-between">
         <Link
           href="/"
-          className="font-[family-name:var(--font-display)] font-semibold"
+          className="font-[family-name:var(--font-heading)] font-semibold"
           style={{ fontSize: 20, color: "#1e1812" }}
         >
           ScentMatch

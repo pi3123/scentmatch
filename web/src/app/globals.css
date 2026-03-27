@@ -30,7 +30,7 @@
   --color-amber-400: #e8b94e;
   --color-amber-500: #c4973e;
 
-  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-heading: "Cormorant Garamond", Georgia, serif;
   --font-body: "Inter", -apple-system, sans-serif;
 }
 
@@ -40,7 +40,7 @@
   font-style: normal;
   font-weight: 400 600;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3bmX5slCNuHLi8bLeY9MK7whWMhyjornFLsS6V7w.woff2") format("woff2");
+  src: url("https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYqXtK.woff2") format("woff2");
 }
 
 /* Cormorant Garamond — italic 400-500 */
@@ -49,7 +49,7 @@
   font-style: italic;
   font-weight: 400 500;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtJmyW1xw.woff2") format("woff2");
+  src: url("https://fonts.gstatic.com/s/cormorantgaramond/v21/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtImSo.woff2") format("woff2");
 }
 
 /* Inter — 300-600 */
@@ -58,7 +58,7 @@
   font-style: normal;
   font-weight: 300 600;
   font-display: swap;
-  src: url("https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2") format("woff2");
+  src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2") format("woff2");
 }
 
 * {

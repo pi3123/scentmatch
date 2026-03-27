@@ -90,7 +90,7 @@ export default function Home() {
         style={{ gridTemplateColumns: "1fr 1.2fr" }}
       >
         {/* Left column: text + search */}
-        <div className="flex flex-col justify-center" style={{ padding: "120px 48px 80px 80px" }}>
+        <div className="flex flex-col justify-center" style={{ padding: "100px 48px 60px 80px" }}>
           <p
             className="text-[11px] uppercase font-semibold text-brown-light opacity-0 animate-fadeUp"
             style={{ letterSpacing: "0.25em", animationDelay: "0.2s", animationFillMode: "forwards" }}
@@ -99,7 +99,7 @@ export default function Home() {
           </p>
 
           <h1
-            className="font-[family-name:var(--font-display)] text-[64px] font-medium text-brown leading-none tracking-tight opacity-0 animate-fadeUp"
+            className="font-[family-name:var(--font-heading)] text-[64px] font-medium text-brown leading-none tracking-tight opacity-0 animate-fadeUp"
             style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}
           >
             Will you
@@ -158,7 +158,7 @@ export default function Home() {
             className={`py-5 px-8 opacity-0 animate-fadeUp${i < stats.length - 1 ? " border-r border-cream-200" : ""}`}
             style={{ animationDelay: stat.delay, animationFillMode: "forwards" }}
           >
-            <div className="font-[family-name:var(--font-display)] text-[26px] font-semibold text-brown">
+            <div className="font-[family-name:var(--font-heading)] text-[26px] font-semibold text-brown">
               {stat.value}
             </div>
             <div className="text-[11px] uppercase font-medium text-brown-light mt-0.5" style={{ letterSpacing: "0.125em" }}>
@@ -168,36 +168,30 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Score result area */}
-      <div className="mx-auto mt-10 w-full max-w-xl px-4">
-        {loading && (
-          <div className="flex flex-col items-center gap-3 py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-cream-200 border-t-brown" />
-            <p className="text-sm text-brown-mid">Analyzing fragrance...</p>
-          </div>
-        )}
+      {/* Score result area — full width for the two-column grid */}
+      {loading && (
+        <div className="flex flex-col items-center gap-3 py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-cream-200 border-t-brown" />
+          <p className="text-sm text-brown-mid">Analyzing fragrance...</p>
+        </div>
+      )}
 
-        {error && (
-          <div className="rounded-xl border border-rose/20 bg-rose/10 px-4 py-3 text-sm text-rose">
+      {error && (
+        <div className="mx-auto max-w-xl px-4">
+          <div className="rounded-md border border-rose/20 bg-rose/10 px-4 py-3 text-sm text-rose">
             {error}
           </div>
-        )}
+        </div>
+      )}
 
-        {matchResult && !loading && (
-          <MatchResult
-            result={matchResult}
-            onAddToCollection={handleAddToCollection}
-          />
-        )}
+      {matchResult && !loading && (
+        <MatchResult
+          result={matchResult}
+          onAddToCollection={handleAddToCollection}
+        />
+      )}
 
-        {!matchResult && !loading && !error && (
-          <div className="py-16 text-center">
-            <p className="text-sm text-brown-mid">
-              Search above to score a fragrance
-            </p>
-          </div>
-        )}
-      </div>
+      {!matchResult && !loading && !error && null}
     </div>
   );
 }

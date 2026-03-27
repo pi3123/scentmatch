@@ -119,7 +119,7 @@ export default function ProfilePage() {
         <div className="border-r border-white/[0.06] p-[52px] pr-12">
           <TasteProfile preferences={preferences} stats={stats} />
         </div>
-        <div className="p-[52px] pl-12">
+        <div className="flex flex-col p-[52px] pl-12">
           <NoteSwiper
             notes={notes}
             existingPreferences={preferences}

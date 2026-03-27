@@ -56,7 +56,7 @@ export default function CollectionPage() {
     <div className="mx-auto max-w-[1280px] px-16 pt-[54px] py-12">
       {/* Header */}
       <div className="flex items-baseline justify-between mb-1">
-        <h1 className="font-display text-[30px] font-medium text-brown">
+        <h1 className="font-heading text-[30px] font-medium text-brown">
           Your Collection
         </h1>
         <button
@@ -121,27 +121,44 @@ export default function CollectionPage() {
           </p>
         </div>
       ) : (
-        <div
-          className="grid gap-2.5"
-          style={{
-            gridTemplateColumns: "1.4fr 1fr 1fr",
-            gridAutoRows: "270px",
-          }}
-        >
-          {filtered.map((item, index) => (
-            <div
-              key={item.fragranceId}
-              className={index === 0 ? "feat h-full" : "h-full"}
-              style={index === 0 ? { gridRow: "1 / 3" } : undefined}
-            >
-              <FragranceCard
-                item={item}
-                onRemove={handleRemove}
-                featured={index === 0}
-              />
-            </div>
-          ))}
-        </div>
+        {filtered.length >= 3 ? (
+          <div
+            className="grid gap-2.5"
+            style={{
+              gridTemplateColumns: "1.4fr 1fr 1fr",
+              gridAutoRows: "270px",
+            }}
+          >
+            {filtered.map((item, index) => (
+              <div
+                key={item.fragranceId}
+                className={index === 0 ? "feat h-full" : "h-full"}
+                style={index === 0 ? { gridRow: "1 / 3" } : undefined}
+              >
+                <FragranceCard
+                  item={item}
+                  onRemove={handleRemove}
+                  featured={index === 0}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            className="grid grid-cols-2 gap-2.5"
+            style={{ gridAutoRows: "270px" }}
+          >
+            {filtered.map((item) => (
+              <div key={item.fragranceId} className="h-full">
+                <FragranceCard
+                  item={item}
+                  onRemove={handleRemove}
+                  featured={false}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       )}
     </div>
   );

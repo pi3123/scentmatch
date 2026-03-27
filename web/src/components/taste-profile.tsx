@@ -43,16 +43,6 @@ export function TasteProfile({
     .slice(0, 5);
   const maxCat = topCategories[0]?.[1] ?? 1;
 
-  if (preferences.length === 0) {
-    return (
-      <div className="py-8 text-center">
-        <p className="text-[14px] text-brown-light">
-          Rate some notes to build your taste profile.
-        </p>
-      </div>
-    );
-  }
-
   const noteGroups = [
     { label: "Love", items: loved, chipBg: "bg-sage/[0.15]", chipText: "text-[#a3c497]" },
     { label: "Like", items: liked, chipBg: "bg-amber/[0.12]", chipText: "text-[#d4b870]" },
@@ -62,7 +52,7 @@ export function TasteProfile({
   return (
     <div>
       {/* Heading */}
-      <h2 className="font-[family-name:var(--font-display)] text-[30px] font-medium text-cream-50">
+      <h2 className="font-[family-name:var(--font-heading)] text-[30px] font-medium text-cream-50">
         Your Taste DNA
       </h2>
       <p className="mb-7 text-[14px] text-brown-light">
@@ -81,7 +71,7 @@ export function TasteProfile({
             key={label}
             className={`border-white/[0.06] p-4 text-center${i < 3 ? " border-r" : ""}`}
           >
-            <p className="font-[family-name:var(--font-display)] text-[26px] font-medium text-cream-50">
+            <p className="font-[family-name:var(--font-heading)] text-[26px] font-medium text-cream-50">
               {value}
             </p>
             <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.125em] text-brown-light">
@@ -90,6 +80,14 @@ export function TasteProfile({
           </div>
         ))}
       </div>
+
+      {preferences.length === 0 && (
+        <div className="py-8 text-center">
+          <p className="text-[14px] text-brown-light">
+            Rate some notes to build your taste profile.
+          </p>
+        </div>
+      )}
 
       {/* Accord bars */}
       {topCategories.length > 0 && (
@@ -114,7 +112,7 @@ export function TasteProfile({
                     }}
                   />
                 </div>
-                <span className="w-9 font-[family-name:var(--font-display)] text-[16px] font-medium text-brown-light">
+                <span className="w-9 font-[family-name:var(--font-heading)] text-[16px] font-medium text-brown-light">
                   {pct}%
                 </span>
               </div>

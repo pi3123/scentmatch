@@ -23,7 +23,7 @@ export function MatchResult({
       }}
     >
       {/* Left column — score image */}
-      <div className="group relative flex items-center justify-center bg-cream-100 p-12">
+      <div className="group relative flex items-center justify-center bg-white p-12">
         {result.fragrance.imageUrl ? (
           <img
             src={result.fragrance.imageUrl}
@@ -47,7 +47,7 @@ export function MatchResult({
             boxShadow: "0 6px 24px rgba(0,0,0,0.2)",
           }}
         >
-          <span className="font-[family-name:var(--font-display)] text-[30px] font-semibold text-cream-50">
+          <span className="font-[family-name:var(--font-heading)] text-[30px] font-semibold text-cream-50">
             {result.match_score}
           </span>
           <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.125em] text-brown-light">
@@ -59,7 +59,7 @@ export function MatchResult({
       {/* Right column — score info */}
       <div className="flex flex-col p-11 px-[52px]">
         {/* Fragrance name */}
-        <h2 className="font-[family-name:var(--font-display)] text-[34px] font-medium leading-tight text-brown">
+        <h2 className="font-[family-name:var(--font-heading)] text-[34px] font-medium leading-tight text-brown">
           {result.fragrance.name}
         </h2>
 
@@ -73,7 +73,7 @@ export function MatchResult({
 
         {/* Verdict / explanation */}
         {result.explanation && (
-          <p className="mb-6 rounded-md border-l-[3px] border-amber bg-cream-100 p-4 font-[family-name:var(--font-display)] text-[17px] italic leading-relaxed text-brown-mid">
+          <p className="mb-6 rounded-md border-l-[3px] border-amber bg-cream-100 p-4 font-[family-name:var(--font-heading)] text-[17px] italic leading-relaxed text-brown-mid">
             {result.explanation}
           </p>
         )}
@@ -127,7 +127,7 @@ export function MatchResult({
                         </p>
                       )}
                     </div>
-                    <span className="ml-auto font-[family-name:var(--font-display)] text-[20px] font-semibold text-sage">
+                    <span className="ml-auto font-[family-name:var(--font-heading)] text-[20px] font-semibold text-sage">
                       {Math.round(comp.similarity * 100)}%
                     </span>
                   </div>

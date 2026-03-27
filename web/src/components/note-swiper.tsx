@@ -68,7 +68,7 @@ export function NoteSwiper({
   if (unrated.length === 0 || index >= unrated.length) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <p className="font-[family-name:var(--font-display)] text-[20px] font-medium text-cream-50">
+        <p className="font-[family-name:var(--font-heading)] text-[20px] font-medium text-cream-50">
           All caught up!
         </p>
         <p className="mt-2 text-[13px] text-brown-light">
@@ -90,7 +90,7 @@ export function NoteSwiper({
     <div className="flex flex-col">
       {/* Header */}
       <div className="mb-6 flex items-baseline justify-between">
-        <h3 className="font-[family-name:var(--font-display)] text-[22px] font-medium text-cream-50">
+        <h3 className="font-[family-name:var(--font-heading)] text-[22px] font-medium text-cream-50">
           Rate Notes
         </h3>
         <span className="text-[11px] font-medium uppercase tracking-[0.125em] text-brown-light">
@@ -102,7 +102,7 @@ export function NoteSwiper({
       <div className="flex flex-1 flex-col items-center justify-center">
         {/* Card */}
         <div className="w-full max-w-[320px] rounded-xl border border-white/[0.07] bg-white/[0.02] p-11 pb-9 pt-11 text-center transition-transform duration-300 hover:-translate-y-[3px]">
-          <p className="mb-1 font-[family-name:var(--font-display)] text-[32px] font-medium text-cream-50">
+          <p className="mb-1 font-[family-name:var(--font-heading)] text-[32px] font-medium text-cream-50">
             {current.name}
           </p>
           {current.category && (
