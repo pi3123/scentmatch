@@ -49,10 +49,10 @@ export function SearchBar({
   }, []);
 
   return (
-    <div ref={ref} className="relative w-full max-w-xl">
+    <div ref={ref} className="relative w-full max-w-[400px]">
       <div className="relative">
         <svg
-          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-warm-600"
+          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brown-light"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -67,17 +67,17 @@ export function SearchBar({
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Search for a fragrance to score..."
-          className="w-full rounded-xl border border-cream-300 bg-white py-3 pl-10 pr-4 text-sm text-warm-800 shadow-sm outline-none transition-shadow placeholder:text-cream-400 focus:border-cream-400 focus:ring-2 focus:ring-cream-200"
+          className="w-full rounded-md border border-cream-200 bg-white py-3.5 pl-11 pr-4 text-sm font-normal text-brown shadow-[0_2px_12px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-brown-light placeholder:text-[14px] hover:border-brown-light hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] focus:border-brown-light"
         />
         {loading && (
           <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-cream-300 border-t-warm-600" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-cream-200 border-t-brown" />
           </div>
         )}
       </div>
 
       {open && results.length > 0 && (
-        <ul className="absolute z-40 mt-1.5 max-h-72 w-full overflow-y-auto rounded-xl border border-cream-200 bg-white py-1 shadow-lg">
+        <ul className="absolute z-40 mt-1.5 max-h-72 w-full overflow-y-auto rounded-lg border border-cream-200 bg-white py-1 shadow-lg">
           {results.map((f) => (
             <li key={f.id}>
               <button
@@ -96,21 +96,21 @@ export function SearchBar({
                     className="h-10 w-8 rounded object-cover"
                   />
                 ) : (
-                  <div className="flex h-10 w-8 items-center justify-center rounded bg-cream-200 text-xs text-warm-600">
+                  <div className="flex h-10 w-8 items-center justify-center rounded bg-cream-200 text-xs text-brown-light">
                     ?
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-warm-800">
+                  <p className="truncate text-sm font-medium text-brown">
                     {f.name}
                   </p>
-                  <p className="truncate text-xs text-warm-600">
+                  <p className="truncate text-xs text-brown-mid">
                     {f.brand}
                     {f.year ? ` (${f.year})` : ""}
                   </p>
                 </div>
                 {f.ratingValue && (
-                  <span className="text-xs text-cream-500">
+                  <span className="text-xs text-brown-light">
                     {f.ratingValue.toFixed(1)}
                   </span>
                 )}
