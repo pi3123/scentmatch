@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
   let explanation = "";
   try {
     const llm = await createLLMAdapter();
-    explanation = await llm.generateExplanation(matchResult, tone);
+    explanation = await llm.generateExplanation(matchResult, tone, fragrance.name, fragrance.brand);
   } catch (err) {
     console.error("LLM explanation failed:", err);
     explanation = "Couldn't generate an explanation right now. Check the score and breakdown above.";

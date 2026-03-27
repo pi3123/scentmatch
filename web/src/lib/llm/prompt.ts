@@ -1,30 +1,41 @@
+import { renderTemplate } from "./renderer";
+
+interface MatchData {
+  match_score: number;
+  confidence: string;
+  note_breakdown?: {
+    loved: string[];
+    liked: string[];
+    neutral: string[];
+    disliked: string[];
+  };
+  risk_factors?: string[];
+  collection_comparisons?: {
+    fragrance_name: string;
+    similarity: number;
+    shared_notes: string[];
+  }[];
+}
+
 export function buildPrompt(
   matchResult: unknown,
-  tone: string
+  tone: string,
+  fragranceName?: string,
+  fragranceBrand?: string
 ): { system: string; user: string } {
-  const toneInstructions: Record<string, string> = {
-    casual:
-      "You're a knowledgeable friend giving fragrance advice. Be casual, warm, and use everyday language. No jargon without explaining it. Use comparisons to things in their collection.",
-    expert:
-      "You're a fragrance sommelier. Use sophisticated but clear language. Reference note families and composition techniques, but remain accessible.",
-    practical:
-      "Be direct and practical. Focus on whether this is a good buy. State facts, risks, and your bottom line recommendation clearly.",
-  };
+  const data = matchResult as MatchData;
 
-  const system = `You are a fragrance advisor helping someone decide whether to blind-buy a fragrance.
+  const system = renderTemplate("system.j2", { tone });
 
-${toneInstructions[tone] || toneInstructions.casual}
-
-Rules:
-- Keep it to 2-4 sentences
-- Reference specific fragrances from their collection when comparing
-- If confidence is low or the user has very few collection items/rated notes, tell them to go add more fragrances to their collection and rate more notes so you can give a better recommendation
-- If there are risk factors (disliked notes), mention them honestly
-- Never make up information not in the data provided`;
-
-  const user = `Here is the matching analysis. Write a brief, helpful explanation.
-
-${JSON.stringify(matchResult, null, 2)}`;
+  const user = renderTemplate("user.j2", {
+    fragrance_name: fragranceName || "Unknown",
+    fragrance_brand: fragranceBrand || "Unknown",
+    match_score: data.match_score ?? 0,
+    confidence: data.confidence ?? "unknown",
+    note_breakdown: data.note_breakdown || null,
+    risk_factors: data.risk_factors || [],
+    collection_comparisons: data.collection_comparisons || [],
+  });
 
   return { system, user };
 }

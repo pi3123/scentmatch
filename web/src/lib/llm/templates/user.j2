@@ -1,0 +1,24 @@
+Here is the matching analysis for "{{ fragrance_name }}" by {{ fragrance_brand }}. Write a brief, helpful explanation.
+
+Match score: {{ match_score }}/100
+Confidence: {{ confidence }}
+
+{% if note_breakdown -%}
+Notes you love in this fragrance: {{ note_breakdown.loved | join(", ") or "none" }}
+Notes you like: {{ note_breakdown.liked | join(", ") or "none" }}
+Neutral notes: {{ note_breakdown.neutral | join(", ") or "none" }}
+Notes you dislike: {{ note_breakdown.disliked | join(", ") or "none" }}
+{% endif %}
+
+{% if risk_factors and risk_factors | length > 0 -%}
+Risk factors: {{ risk_factors | join("; ") }}
+{% endif %}
+
+{% if collection_comparisons and collection_comparisons | length > 0 -%}
+Similar fragrances in your collection:
+{% for comp in collection_comparisons -%}
+- {{ comp.fragrance_name }} ({{ (comp.similarity * 100) | round }}% similar, shared notes: {{ comp.shared_notes | join(", ") }})
+{% endfor %}
+{% else -%}
+No fragrances in your collection to compare against.
+{% endif %}

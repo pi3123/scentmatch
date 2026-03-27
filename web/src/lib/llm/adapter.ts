@@ -1,7 +1,9 @@
 export interface LLMAdapter {
   generateExplanation(
     matchResult: unknown,
-    tone: string
+    tone: string,
+    fragranceName?: string,
+    fragranceBrand?: string
   ): Promise<string>;
 }
 

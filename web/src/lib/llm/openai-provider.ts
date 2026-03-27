@@ -14,9 +14,11 @@ export class OpenAIProvider implements LLMAdapter {
 
   async generateExplanation(
     matchResult: unknown,
-    tone: string
+    tone: string,
+    fragranceName?: string,
+    fragranceBrand?: string
   ): Promise<string> {
-    const prompt = buildPrompt(matchResult, tone);
+    const prompt = buildPrompt(matchResult, tone, fragranceName, fragranceBrand);
 
     const res = await fetch(`${this.baseUrl}/chat/completions`, {
       method: "POST",
