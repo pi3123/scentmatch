@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserId } from "@/lib/get-user-id";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const preferences = await prisma.notePreference.findMany({
-    where: { userId: session.user.id },
+    where: { userId },
     include: { note: true },
   });
 
@@ -18,10 +14,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const body = await request.json();
   const { noteId, preference } = body;
@@ -33,13 +26,13 @@ export async function POST(request: NextRequest) {
   const pref = await prisma.notePreference.upsert({
     where: {
       userId_noteId: {
-        userId: session.user.id,
+        userId,
         noteId: parseInt(noteId),
       },
     },
     update: { preference, source: "explicit" },
     create: {
-      userId: session.user.id,
+      userId,
       noteId: parseInt(noteId),
       preference,
       source: "explicit",

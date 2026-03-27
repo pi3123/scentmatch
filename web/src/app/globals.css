@@ -1,26 +1,93 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream-50: #faf8f5;
+  --color-cream-100: #f5f0e8;
+  --color-cream-200: #ebe3d5;
+  --color-cream-300: #ddd1bb;
+  --color-cream-400: #c9b898;
+  --color-cream-500: #b5a07a;
+  --color-warm-600: #8b7355;
+  --color-warm-700: #6b5840;
+  --color-warm-800: #4a3d2e;
+  --color-warm-900: #2d2519;
+
+  --color-sage-400: #8faa7e;
+  --color-sage-500: #6d8f5e;
+  --color-sage-600: #567347;
+
+  --color-rose-400: #d4868a;
+  --color-rose-500: #c06268;
+
+  --color-sky-400: #7db3c9;
+  --color-sky-500: #5a9ab5;
+
+  --color-amber-400: #e8b94e;
+  --color-amber-500: #d4a235;
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDTbtPY_Q.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxhS23PjQ.woff2") format("woff2");
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream-50);
+  color: var(--color-warm-800);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
 }
+
+::selection {
+  background: var(--color-cream-300);
+  color: var(--color-warm-900);
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+/* Fade-in for match results */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* Stagger children */
+.stagger-children > * {
+  animation: fade-up 0.3s ease-out both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }

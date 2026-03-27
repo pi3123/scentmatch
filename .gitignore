@@ -6,3 +6,5 @@ node_modules/
 engine/venv/
 __pycache__/
 *.pyc
+*.db
+screenshots/

@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserId } from "@/lib/get-user-id";
 import { getMatch } from "@/lib/matching-client";
 import { createLLMAdapter } from "@/lib/llm/adapter";
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const { fragranceId } = await request.json();
   if (!fragranceId) {
@@ -26,14 +22,14 @@ export async function POST(request: NextRequest) {
   }
 
   const collection = await prisma.userCollection.findMany({
-    where: { userId: session.user.id },
+    where: { userId },
     include: {
       fragrance: { include: { notes: { include: { note: true } } } },
     },
   });
 
   const preferences = await prisma.notePreference.findMany({
-    where: { userId: session.user.id },
+    where: { userId },
     include: { note: true },
   });
 
@@ -80,7 +76,7 @@ export async function POST(request: NextRequest) {
   });
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
   });
   const tone = user?.preferredTone || "casual";
 

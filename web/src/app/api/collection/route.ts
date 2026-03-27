@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserId } from "@/lib/get-user-id";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const collection = await prisma.userCollection.findMany({
-    where: { userId: session.user.id },
+    where: { userId },
     include: {
       fragrance: {
         include: { notes: { include: { note: true } } },
@@ -23,10 +19,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const body = await request.json();
   const { fragranceId, status, rating } = body;
@@ -42,19 +35,21 @@ export async function POST(request: NextRequest) {
   const item = await prisma.userCollection.upsert({
     where: {
       userId_fragranceId: {
-        userId: session.user.id,
+        userId,
         fragranceId: parseInt(fragranceId),
       },
     },
     update: { status, rating: rating ?? null },
     create: {
-      userId: session.user.id,
+      userId,
       fragranceId: parseInt(fragranceId),
       status,
       rating: rating ?? null,
     },
     include: {
-      fragrance: true,
+      fragrance: {
+        include: { notes: { include: { note: true } } },
+      },
     },
   });
 
@@ -62,17 +57,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const userId = await getUserId();
 
   const { fragranceId } = await request.json();
 
   await prisma.userCollection.delete({
     where: {
       userId_fragranceId: {
-        userId: session.user.id,
+        userId,
         fragranceId: parseInt(fragranceId),
       },
     },
