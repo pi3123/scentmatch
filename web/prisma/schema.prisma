@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model Fragrance {
@@ -14,9 +14,9 @@ model Fragrance {
   gender       String?
   ratingValue  Float?           @map("rating_value")
   ratingCount  Int?             @map("rating_count")
-  mainAccords  Json?            @map("main_accords")
-  longevity    Json?            @map("longevity_votes")
-  sillage      Json?            @map("sillage_votes")
+  mainAccords  String?          @map("main_accords")
+  longevity    String?          @map("longevity_votes")
+  sillage      String?          @map("sillage_votes")
   imageUrl     String?          @map("image_url")
   notes        FragranceNote[]
   collections  UserCollection[]
