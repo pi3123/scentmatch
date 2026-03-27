@@ -42,7 +42,7 @@ export function FragranceCard({
   if (featured) {
     return (
       <div
-        className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-cream-100 cursor-pointer transition duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] hover:shadow-[0_12px_40px_rgba(30,24,18,0.08)]"
+        className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-white cursor-pointer transition duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] hover:shadow-[0_12px_40px_rgba(30,24,18,0.08)]"
       >
         <button
           onClick={() => onRemove(f.id)}
@@ -54,7 +54,7 @@ export function FragranceCard({
           </svg>
         </button>
 
-        <div className="flex flex-1 items-center justify-center overflow-hidden bg-cream-100 p-4">
+        <div className="flex flex-1 items-center justify-center overflow-hidden bg-white p-4">
           {f.imageUrl ? (
             <img
               src={f.imageUrl}
@@ -99,7 +99,7 @@ export function FragranceCard({
   // Regular card
   return (
     <div
-      className="group relative flex h-full flex-row overflow-hidden rounded-lg bg-cream-100 cursor-pointer transition duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] hover:shadow-[0_12px_40px_rgba(30,24,18,0.08)]"
+      className="group relative flex h-full flex-row overflow-hidden rounded-lg bg-white cursor-pointer transition duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] hover:shadow-[0_12px_40px_rgba(30,24,18,0.08)]"
     >
       <button
         onClick={() => onRemove(f.id)}
@@ -111,7 +111,7 @@ export function FragranceCard({
         </svg>
       </button>
 
-      <div className="flex w-[120px] shrink-0 items-center justify-center bg-cream-100 p-2.5">
+      <div className="flex w-[120px] shrink-0 items-center justify-center bg-white p-2.5">
         {f.imageUrl ? (
           <img
             src={f.imageUrl}

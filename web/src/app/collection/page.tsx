@@ -120,45 +120,43 @@ export default function CollectionPage() {
               : "No fragrances match this filter."}
           </p>
         </div>
+      ) : filtered.length >= 3 ? (
+        <div
+          className="grid gap-2.5"
+          style={{
+            gridTemplateColumns: "1.4fr 1fr 1fr",
+            gridAutoRows: "270px",
+          }}
+        >
+          {filtered.map((item, index) => (
+            <div
+              key={item.fragranceId}
+              className={index === 0 ? "feat h-full" : "h-full"}
+              style={index === 0 ? { gridRow: "1 / 3" } : undefined}
+            >
+              <FragranceCard
+                item={item}
+                onRemove={handleRemove}
+                featured={index === 0}
+              />
+            </div>
+          ))}
+        </div>
       ) : (
-        {filtered.length >= 3 ? (
-          <div
-            className="grid gap-2.5"
-            style={{
-              gridTemplateColumns: "1.4fr 1fr 1fr",
-              gridAutoRows: "270px",
-            }}
-          >
-            {filtered.map((item, index) => (
-              <div
-                key={item.fragranceId}
-                className={index === 0 ? "feat h-full" : "h-full"}
-                style={index === 0 ? { gridRow: "1 / 3" } : undefined}
-              >
-                <FragranceCard
-                  item={item}
-                  onRemove={handleRemove}
-                  featured={index === 0}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div
-            className="grid grid-cols-2 gap-2.5"
-            style={{ gridAutoRows: "270px" }}
-          >
-            {filtered.map((item) => (
-              <div key={item.fragranceId} className="h-full">
-                <FragranceCard
-                  item={item}
-                  onRemove={handleRemove}
-                  featured={false}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        <div
+          className="grid grid-cols-2 gap-2.5"
+          style={{ gridAutoRows: "270px" }}
+        >
+          {filtered.map((item) => (
+            <div key={item.fragranceId} className="h-full">
+              <FragranceCard
+                item={item}
+                onRemove={handleRemove}
+                featured={false}
+              />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
