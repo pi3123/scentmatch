@@ -34,11 +34,8 @@ function loadJson(filename: string): Perfume[] {
 }
 
 async function main() {
-  console.log("Loading data files...");
-  const perfumes = [
-    ...loadJson("top_1000_perfumes.json"),
-    ...loadJson("remaining_perfumes.json"),
-  ];
+  console.log("Loading data...");
+  const perfumes = loadJson("perfumes.json");
   console.log(`Total: ${perfumes.length} perfumes to import\n`);
 
   const noteCache = new Map<string, number>();
