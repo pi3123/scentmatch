@@ -15,7 +15,7 @@ export function AuthButton() {
     return (
       <button
         onClick={() => signOut()}
-        className="rounded-lg px-3 py-1.5 text-sm font-medium text-warm-600 transition-colors hover:bg-cream-100 hover:text-warm-800"
+        className="text-brown-light hover:text-brown text-[12px] uppercase tracking-[0.094em] font-medium transition-colors"
       >
         Sign out
       </button>
@@ -25,7 +25,7 @@ export function AuthButton() {
   return (
     <button
       onClick={() => signIn("google")}
-      className="rounded-lg bg-warm-700 px-3 py-1.5 text-sm font-medium text-cream-50 transition-colors hover:bg-warm-800"
+      className="bg-brown text-cream-50 rounded py-[7px] px-[18px] text-[12px] uppercase tracking-[0.094em] font-medium transition-colors hover:bg-[#2a2218]"
     >
       Sign in
     </button>

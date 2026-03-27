@@ -178,7 +178,7 @@ export default function Home() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-500">
+          <div className="rounded-xl border border-rose/20 bg-rose/10 px-4 py-3 text-sm text-rose">
             {error}
           </div>
         )}
