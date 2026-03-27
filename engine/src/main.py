@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from .models import MatchRequest, MatchResult
+from .matching.scorer import compute_match
 
 app = FastAPI(title="ScentMatch Engine", version="0.1.0")
 
@@ -11,12 +12,9 @@ def health():
 
 @app.post("/match", response_model=MatchResult)
 def match(request: MatchRequest) -> MatchResult:
-    # Placeholder — will be implemented in Phase 2
-    return MatchResult(
-        match_score=0,
-        confidence="none",
-        note_breakdown={"loved": [], "liked": [], "neutral": [], "disliked": []},
-        collection_comparisons=[],
-        risk_factors=[],
-        active_layers=[],
+    return compute_match(
+        request.target,
+        request.collection,
+        request.note_preferences,
+        community_stats=request.community_stats,
     )
