@@ -18,7 +18,7 @@ ${toneInstructions[tone] || toneInstructions.casual}
 Rules:
 - Keep it to 2-4 sentences
 - Reference specific fragrances from their collection when comparing
-- If confidence is low, acknowledge you don't know their taste well yet
+- If confidence is low or the user has very few collection items/rated notes, tell them to go add more fragrances to their collection and rate more notes so you can give a better recommendation
 - If there are risk factors (disliked notes), mention them honestly
 - Never make up information not in the data provided`;
 
