@@ -1,11 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
-const dbPath = resolve(__dirname, "../dev.db");
-const adapter = new PrismaBetterSqlite3({ url: dbPath });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 interface Perfume {
   id: string;
@@ -24,12 +21,25 @@ interface Perfume {
   url: string | null;
 }
 
-async function main() {
-  const jsonPath = resolve(__dirname, "../../data/top_1000_perfumes.json");
-  const raw = readFileSync(jsonPath, "utf-8");
-  const perfumes: Perfume[] = JSON.parse(raw);
+function loadJson(filename: string): Perfume[] {
+  const filePath = resolve(__dirname, "../../data", filename);
+  if (!existsSync(filePath)) {
+    console.log(`  Skipping ${filename} (not found)`);
+    return [];
+  }
+  const raw = readFileSync(filePath, "utf-8");
+  const data: Perfume[] = JSON.parse(raw);
+  console.log(`  ${filename}: ${data.length} perfumes`);
+  return data;
+}
 
-  console.log(`Found ${perfumes.length} perfumes to import`);
+async function main() {
+  console.log("Loading data files...");
+  const perfumes = [
+    ...loadJson("top_1000_perfumes.json"),
+    ...loadJson("remaining_perfumes.json"),
+  ];
+  console.log(`Total: ${perfumes.length} perfumes to import\n`);
 
   const noteCache = new Map<string, number>();
 
@@ -51,7 +61,7 @@ async function main() {
   await prisma.userCollection.deleteMany();
   await prisma.fragrance.deleteMany();
   await prisma.note.deleteMany();
-  console.log("Cleared existing fragrance data");
+  console.log("Cleared existing fragrance data\n");
 
   let imported = 0;
   let skipped = 0;
@@ -63,7 +73,6 @@ async function main() {
         continue;
       }
 
-      // Convert accords list to a record (no strength % available, use equal weights)
       const mainAccords: Record<string, number> = {};
       for (const accord of p.accords ?? []) {
         mainAccords[accord] = 1;
@@ -90,7 +99,6 @@ async function main() {
         { key: "base_notes" as const, layer: "base" },
       ];
 
-      // Track seen noteIds per fragrance to avoid duplicate composite keys
       const seenNotes = new Set<number>();
 
       for (const { key, layer } of layers) {
@@ -113,7 +121,7 @@ async function main() {
       }
 
       imported++;
-      if (imported % 100 === 0) {
+      if (imported % 1000 === 0) {
         console.log(`  ${imported} imported...`);
       }
     } catch (err) {
