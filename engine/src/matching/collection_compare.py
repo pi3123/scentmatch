@@ -18,7 +18,7 @@ def find_collection_comparisons(
     collection: list[CollectionItem],
     max_results: int = 3,
 ) -> list[CollectionComparison]:
-    experienced = [item for item in collection if item.status in ("own", "tried")]
+    experienced = [item for item in collection if item.status in ("own", "tried", "want")]
 
     if not experienced:
         return []

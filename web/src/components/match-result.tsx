@@ -73,7 +73,7 @@ export function MatchResult({
 
         {/* Verdict / explanation */}
         {result.explanation && (
-          <p className="mb-6 rounded-md border-l-[3px] border-amber bg-cream-100 p-4 font-[family-name:var(--font-heading)] text-[17px] italic leading-relaxed text-brown-mid">
+          <p className="mb-6 rounded-md border-l-[3px] border-amber bg-cream-100 p-4 text-[15px] leading-relaxed text-brown-mid">
             {result.explanation}
           </p>
         )}

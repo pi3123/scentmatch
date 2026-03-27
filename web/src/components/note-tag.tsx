@@ -15,7 +15,7 @@ export function NoteTag({
   const cls = styles[preference] ?? styles.neutral;
   return (
     <span
-      className={`inline-flex items-center text-[13px] font-medium py-1 px-3 rounded transition-transform hover:-translate-y-px ${cls}`}
+      className={`inline-flex items-center text-[14px] font-medium py-1.5 px-3.5 rounded transition-transform hover:-translate-y-px ${cls}`}
     >
       {name}
     </span>

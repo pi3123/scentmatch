@@ -69,6 +69,8 @@ body {
   background: var(--color-cream-50);
   color: var(--color-brown);
   font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
