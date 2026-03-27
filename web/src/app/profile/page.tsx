@@ -104,24 +104,22 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-24">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cream-300 border-t-warm-600" />
+      <div className="flex min-h-screen items-center justify-center bg-brown">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cream-200 border-t-brown-light" />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-warm-800">
-        My Taste Profile
-      </h1>
-      <p className="mt-1 text-sm text-warm-600">
-        Your preferences shape how we score fragrances for you.
-      </p>
-
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_300px]">
-        <TasteProfile preferences={preferences} stats={stats} />
-        <div>
+    <div className="min-h-screen bg-brown pt-[54px] text-cream-50">
+      <div
+        className="grid min-h-[calc(100vh-54px)]"
+        style={{ gridTemplateColumns: "1.1fr 0.9fr" }}
+      >
+        <div className="border-r border-white/[0.06] p-[52px] pr-12">
+          <TasteProfile preferences={preferences} stats={stats} />
+        </div>
+        <div className="p-[52px] pl-12">
           <NoteSwiper
             notes={notes}
             existingPreferences={preferences}

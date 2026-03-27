@@ -1,7 +1,5 @@
 "use client";
 
-import { NoteTag } from "./note-tag";
-
 interface NotePreferenceItem {
   noteId: number;
   preference: string;
@@ -14,6 +12,14 @@ interface CollectionStats {
   tried: number;
   want: number;
 }
+
+const barColors = [
+  "bg-amber",
+  "bg-sage",
+  "bg-brown-light",
+  "bg-rose",
+  null, // index 4 uses inline style
+];
 
 export function TasteProfile({
   preferences,
@@ -34,105 +40,112 @@ export function TasteProfile({
   }
   const topCategories = [...categoryMap.entries()]
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6);
+    .slice(0, 5);
   const maxCat = topCategories[0]?.[1] ?? 1;
 
+  if (preferences.length === 0) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-[14px] text-brown-light">
+          Rate some notes to build your taste profile.
+        </p>
+      </div>
+    );
+  }
+
+  const noteGroups = [
+    { label: "Love", items: loved, chipBg: "bg-sage/[0.15]", chipText: "text-[#a3c497]" },
+    { label: "Like", items: liked, chipBg: "bg-amber/[0.12]", chipText: "text-[#d4b870]" },
+    { label: "Avoid", items: disliked, chipBg: "bg-rose/[0.12]", chipText: "text-[#d49690]" },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+    <div>
+      {/* Heading */}
+      <h2 className="font-[family-name:var(--font-display)] text-[30px] font-medium text-cream-50">
+        Your Taste DNA
+      </h2>
+      <p className="mb-7 text-[14px] text-brown-light">
+        Built from {stats.total} fragrances and {preferences.length} rated notes
+      </p>
+
+      {/* Stats grid */}
+      <div className="mb-7 grid grid-cols-4 overflow-hidden rounded-md border border-white/[0.06]">
         {[
           { label: "Owned", value: stats.own },
           { label: "Tried", value: stats.tried },
           { label: "Wishlist", value: stats.want },
-        ].map(({ label, value }) => (
+          { label: "Notes", value: preferences.length },
+        ].map(({ label, value }, i) => (
           <div
             key={label}
-            className="rounded-xl border border-cream-200 bg-white p-4 text-center"
+            className={`border-white/[0.06] p-4 text-center${i < 3 ? " border-r" : ""}`}
           >
-            <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-warm-800">
+            <p className="font-[family-name:var(--font-display)] text-[26px] font-medium text-cream-50">
               {value}
             </p>
-            <p className="mt-0.5 text-xs text-warm-600">{label}</p>
+            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.125em] text-brown-light">
+              {label}
+            </p>
           </div>
         ))}
       </div>
 
-      {/* Loved Notes */}
-      {loved.length > 0 && (
-        <div className="rounded-xl border border-cream-200 bg-white p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-600">
-            Notes You Love
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {loved.map((p) => (
-              <NoteTag key={p.noteId} name={p.note.name} preference="love" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Liked Notes */}
-      {liked.length > 0 && (
-        <div className="rounded-xl border border-cream-200 bg-white p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-600">
-            Notes You Like
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {liked.map((p) => (
-              <NoteTag key={p.noteId} name={p.note.name} preference="like" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Disliked Notes */}
-      {disliked.length > 0 && (
-        <div className="rounded-xl border border-cream-200 bg-white p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-600">
-            Notes to Avoid
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {disliked.map((p) => (
-              <NoteTag key={p.noteId} name={p.note.name} preference="dislike" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Favorite Accord Categories */}
+      {/* Accord bars */}
       {topCategories.length > 0 && (
-        <div className="rounded-xl border border-cream-200 bg-white p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-600">
-            Top Accord Families
-          </h3>
-          <div className="space-y-2">
-            {topCategories.map(([cat, count]) => (
+        <div className="mb-7 flex flex-col gap-3">
+          {topCategories.map(([cat, count], idx) => {
+            const pct = Math.round((count / maxCat) * 100);
+            const colorClass = barColors[idx] ?? null;
+            return (
               <div key={cat} className="flex items-center gap-3">
-                <span className="w-20 truncate text-xs text-warm-700">
+                <span className="w-[100px] text-right text-[13px] text-brown-light">
                   {cat}
                 </span>
-                <div className="flex-1">
+                <div className="flex-1 h-1 rounded-sm overflow-hidden bg-white/[0.04]">
                   <div
-                    className="h-2.5 rounded-full bg-warm-700/80"
-                    style={{ width: `${(count / maxCat) * 100}%` }}
+                    className={`h-full rounded-sm${colorClass ? ` ${colorClass}` : ""}`}
+                    style={{
+                      width: `${pct}%`,
+                      animation: "barGrow 1.2s ease forwards",
+                      animationDelay: `${idx * 0.1}s`,
+                      transformOrigin: "left",
+                      ...(colorClass ? {} : { backgroundColor: "#7a9aad" }),
+                    }}
                   />
                 </div>
-                <span className="text-xs text-warm-600">{count}</span>
+                <span className="w-9 font-[family-name:var(--font-display)] text-[16px] font-medium text-brown-light">
+                  {pct}%
+                </span>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       )}
 
-      {preferences.length === 0 && (
-        <div className="rounded-xl border border-cream-200 bg-white p-8 text-center">
-          <p className="text-4xl">&#127803;</p>
-          <p className="mt-3 text-sm text-warm-600">
-            Rate some notes below to build your taste profile.
-          </p>
-        </div>
-      )}
+      {/* Note groups */}
+      <div className="grid grid-cols-3 gap-3.5">
+        {noteGroups.map(
+          (group) =>
+            group.items.length > 0 && (
+              <div key={group.label}>
+                <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.156em] text-brown-light">
+                  {group.label}
+                </h4>
+                <div className="flex flex-wrap gap-1">
+                  {group.items.map((p) => (
+                    <span
+                      key={p.noteId}
+                      className={`rounded px-2.5 py-0.5 text-[12px] font-medium ${group.chipBg} ${group.chipText}`}
+                    >
+                      {p.note.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
+        )}
+      </div>
     </div>
   );
 }

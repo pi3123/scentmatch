@@ -14,12 +14,38 @@ interface NotePreferenceItem {
   note: { id: number; name: string; category: string | null };
 }
 
-const preferenceButtons = [
-  { value: "love", label: "Love", emoji: "&#10084;&#65039;", color: "bg-sage-500 hover:bg-sage-600 text-white" },
-  { value: "like", label: "Like", emoji: "&#128077;", color: "bg-sky-500 hover:bg-sky-400 text-white" },
-  { value: "neutral", label: "Meh", emoji: "&#128528;", color: "bg-cream-300 hover:bg-cream-400 text-warm-700" },
-  { value: "dislike", label: "Dislike", emoji: "&#128078;", color: "bg-rose-500 hover:bg-rose-400 text-white" },
+const ratingButtons = [
+  {
+    value: "love",
+    icon: "+",
+    label: "Love",
+    hoverClass: "hover:bg-sage/[0.2] hover:border-sage hover:text-sage hover:scale-110",
+  },
+  {
+    value: "like",
+    icon: "~",
+    label: "Like",
+    hoverClass: "hover:bg-amber/[0.2] hover:border-amber hover:text-amber hover:scale-110",
+  },
+  {
+    value: "neutral",
+    icon: "\u2013",
+    label: "Meh",
+    hoverClass: "hover:bg-white/[0.06] hover:border-white/[0.15] hover:scale-110",
+  },
+  {
+    value: "dislike",
+    icon: "\u00d7",
+    label: "Skip",
+    hoverClass: "hover:bg-rose/[0.2] hover:border-rose hover:text-rose hover:scale-110",
+  },
 ];
+
+const dotColors: Record<string, string> = {
+  love: "bg-sage",
+  like: "bg-amber",
+  dislike: "bg-rose",
+};
 
 export function NoteSwiper({
   notes,
@@ -34,12 +60,18 @@ export function NoteSwiper({
   const unrated = notes.filter((n) => !ratedIds.has(n.id));
   const [index, setIndex] = useState(0);
 
+  // Recently rated (last 6)
+  const recentlyRated = existingPreferences
+    .filter((p) => p.preference !== "neutral")
+    .slice(-6);
+
   if (unrated.length === 0 || index >= unrated.length) {
     return (
-      <div className="rounded-xl border border-cream-200 bg-white p-8 text-center">
-        <p className="text-4xl">&#127942;</p>
-        <p className="mt-3 text-sm font-medium text-warm-800">All caught up!</p>
-        <p className="mt-1 text-xs text-warm-600">
+      <div className="flex flex-col items-center justify-center py-16">
+        <p className="font-[family-name:var(--font-display)] text-[20px] font-medium text-cream-50">
+          All caught up!
+        </p>
+        <p className="mt-2 text-[13px] text-brown-light">
           You&apos;ve rated all available notes. Add more fragrances to discover new ones.
         </p>
       </div>
@@ -47,43 +79,75 @@ export function NoteSwiper({
   }
 
   const current = unrated[index];
+  const remaining = unrated.length - index;
 
-  const handleSwipe = async (preference: string) => {
+  const handleSwipe = (preference: string) => {
     onPreferenceSet(current.id, preference);
     setIndex((i) => i + 1);
   };
 
   return (
-    <div className="rounded-xl border border-cream-200 bg-white p-6">
-      <div className="mb-1 flex items-baseline justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-warm-600">
-          Rate This Note
+    <div className="flex flex-col">
+      {/* Header */}
+      <div className="mb-6 flex items-baseline justify-between">
+        <h3 className="font-[family-name:var(--font-display)] text-[22px] font-medium text-cream-50">
+          Rate Notes
         </h3>
-        <span className="text-xs text-cream-500">
-          {unrated.length - index} remaining
+        <span className="text-[11px] font-medium uppercase tracking-[0.125em] text-brown-light">
+          {remaining} Remaining
         </span>
       </div>
 
-      <div className="my-6 text-center">
-        <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-warm-800">
-          {current.name}
-        </p>
-        {current.category && (
-          <p className="mt-1 text-xs text-warm-600">{current.category}</p>
-        )}
-      </div>
+      {/* Card area */}
+      <div className="flex flex-1 flex-col items-center justify-center">
+        {/* Card */}
+        <div className="w-full max-w-[320px] rounded-xl border border-white/[0.07] bg-white/[0.02] p-11 pb-9 pt-11 text-center transition-transform duration-300 hover:-translate-y-[3px]">
+          <p className="mb-1 font-[family-name:var(--font-display)] text-[32px] font-medium text-cream-50">
+            {current.name}
+          </p>
+          {current.category && (
+            <p className="mb-8 text-[13px] text-brown-light">{current.category}</p>
+          )}
+          {!current.category && <div className="mb-8" />}
 
-      <div className="flex justify-center gap-2">
-        {preferenceButtons.map((btn) => (
-          <button
-            key={btn.value}
-            onClick={() => handleSwipe(btn.value)}
-            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-3 text-sm font-medium transition-all active:scale-95 ${btn.color}`}
-          >
-            <span dangerouslySetInnerHTML={{ __html: btn.emoji }} />
-            <span className="text-xs">{btn.label}</span>
-          </button>
-        ))}
+          {/* Rating buttons */}
+          <div className="flex justify-center gap-2.5">
+            {ratingButtons.map((btn) => (
+              <button
+                key={btn.value}
+                onClick={() => handleSwipe(btn.value)}
+                className={`flex h-[54px] w-[54px] cursor-pointer flex-col items-center justify-center gap-0.5 rounded-full border border-white/[0.08] bg-transparent text-brown-light transition-all duration-300 ${btn.hoverClass}`}
+              >
+                <span className="text-[16px] font-medium">{btn.icon}</span>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.0625em]">
+                  {btn.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Recently rated */}
+        {recentlyRated.length > 0 && (
+          <div className="mt-6 w-full max-w-[320px]">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.125em] text-brown-light/[0.35]">
+              Recently Rated
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {recentlyRated.map((p) => (
+                <span
+                  key={p.noteId}
+                  className="flex items-center gap-1.5 rounded border border-white/[0.05] px-2.5 py-0.5 text-[12px] font-medium text-brown-light"
+                >
+                  <span
+                    className={`inline-block h-1.5 w-1.5 rounded-full ${dotColors[p.preference] || "bg-brown-light"}`}
+                  />
+                  {p.note.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
