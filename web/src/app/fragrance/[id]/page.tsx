@@ -38,7 +38,7 @@ export default function FragranceDetailPage() {
   const [matchResult, setMatchResult] = useState<MatchResponse | null>(null);
   const [matchLoading, setMatchLoading] = useState(true);
   const [collectionStatus, setCollectionStatus] = useState<string | null>(null);
-  const [similar, setSimilar] = useState<any[]>([]);
+  const [similar, setSimilar] = useState<FragranceResult[]>([]);
   const [notePreferences, setNotePreferences] = useState<Map<string, string>>(new Map());
   const [notFound, setNotFound] = useState(false);
   const [prefsCount, setPrefsCount] = useState(0);
