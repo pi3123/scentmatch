@@ -8,5 +8,7 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(nextConfig, {
+  org: "subhash-w9",
+  project: "scentmatch",
   silent: !process.env.CI,
 });
