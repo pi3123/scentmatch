@@ -74,7 +74,7 @@ $0/mo at launch (all free tiers). ~$5-7/mo once Railway trial ends. Supabase Pro
 |------|---------|
 | `web/src/lib/supabase/client.ts` | Browser Supabase client (`NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`) |
 | `web/src/lib/supabase/server.ts` | Server Supabase client for API routes and server components |
-| `web/src/middleware.ts` | Refreshes Supabase auth session on each request |
+| `web/src/proxy.ts` | Refreshes Supabase auth session on each request (Next.js 16 uses `proxy.ts`, not `middleware.ts`) |
 | `web/src/app/auth/callback/route.ts` | Handles OAuth redirect from Supabase |
 
 ### Files Modified
