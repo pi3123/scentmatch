@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/get-user-id";
+import { findSimilarAndPersist } from "@/lib/fragella";
 
 export async function GET(
   request: NextRequest,
@@ -12,12 +13,18 @@ export async function GET(
 
   const userId = await getUserId();
 
+  // Get target fragrance (need its name for Fragella fallback)
+  const targetFragrance = await prisma.fragrance.findUnique({
+    where: { id: fragranceId },
+    select: { name: true },
+  });
+
   // Get target fragrance's note IDs
   const targetNotes = await prisma.fragranceNote.findMany({
     where: { fragranceId },
     select: { noteId: true },
   });
-  const noteIds = targetNotes.map((n) => n.noteId);
+  const noteIds = targetNotes.map((n: { noteId: number }) => n.noteId);
 
   if (noteIds.length === 0) {
     return NextResponse.json([]);
@@ -38,7 +45,7 @@ export async function GET(
   const prefMap = new Map(preferences.map((p) => [p.note.name, p.preference]));
 
   // Find fragrances sharing the most notes with target
-  const similar = await prisma.fragrance.findMany({
+  let similar = await prisma.fragrance.findMany({
     where: {
       id: { notIn: excludeIds },
       notes: { some: { noteId: { in: noteIds } } },
@@ -49,6 +56,35 @@ export async function GET(
     },
     take: 50,
   });
+
+  // If fewer than 4 local results, supplement with Fragella
+  if (similar.length < 4 && targetFragrance?.name) {
+    try {
+      await findSimilarAndPersist(targetFragrance.name, 10);
+
+      // Re-fetch target notes in case Fragella persisted new data
+      const refreshedTargetNotes = await prisma.fragranceNote.findMany({
+        where: { fragranceId },
+        select: { noteId: true },
+      });
+      const refreshedNoteIds = refreshedTargetNotes.map((n) => n.noteId);
+
+      // Re-query local DB to pick up newly persisted fragrances
+      similar = await prisma.fragrance.findMany({
+        where: {
+          id: { notIn: excludeIds },
+          notes: { some: { noteId: { in: refreshedNoteIds.length > 0 ? refreshedNoteIds : noteIds } } },
+          imageUrl: { not: null },
+        },
+        include: {
+          notes: { include: { note: true } },
+        },
+        take: 50,
+      });
+    } catch {
+      // Silent failure -- continue with whatever local results we had
+    }
+  }
 
   // Score and sort by shared note count + preference alignment
   const scored = similar.map((frag) => {
