@@ -1,13 +1,29 @@
 import { cookies } from "next/headers";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./auth";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "./prisma";
 
 export async function getUserId(): Promise<string> {
   // Try authenticated user first
   try {
-    const session = await getServerSession(authOptions);
-    if (session?.user?.id) return session.user.id;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      // Ensure user row exists in our DB (first-login sync)
+      await prisma.user.upsert({
+        where: { id: user.id },
+        update: { email: user.email!, name: user.user_metadata?.full_name },
+        create: {
+          id: user.id,
+          email: user.email!,
+          name: user.user_metadata?.full_name,
+          image: user.user_metadata?.avatar_url,
+        },
+      });
+      return user.id;
+    }
   } catch {
     // auth not configured, fall through
   }
