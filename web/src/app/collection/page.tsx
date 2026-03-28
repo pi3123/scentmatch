@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FragranceCard } from "@/components/fragrance-card";
 import { SearchBar } from "@/components/search-bar";
 import type { CollectionItem, FragranceResult } from "@/types";
@@ -13,6 +13,8 @@ export default function CollectionPage() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [addStatus, setAddStatus] = useState<string>("own");
+  const addStatusRef = useRef(addStatus);
+  addStatusRef.current = addStatus;
 
   const fetchCollection = useCallback(async () => {
     try {
@@ -31,7 +33,7 @@ export default function CollectionPage() {
     await fetch("/api/collection", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fragranceId: fragrance.id, status: addStatus }),
+      body: JSON.stringify({ fragranceId: fragrance.id, status: addStatusRef.current }),
     });
     setShowAdd(false);
     fetchCollection();
@@ -60,33 +62,37 @@ export default function CollectionPage() {
           Your Collection
         </h1>
         <button
-          onClick={() => setShowAdd(!showAdd)}
+          onClick={() => { if (!showAdd) setAddStatus("own"); setShowAdd(!showAdd); }}
           className="text-[12px] uppercase tracking-[0.125em] font-medium py-2 px-5 border border-brown rounded text-brown hover:bg-brown hover:text-cream-50 transition"
         >
           {showAdd ? "Cancel" : "Add Fragrance"}
         </button>
       </div>
 
-      {/* Add fragrance modal */}
+      {/* Add fragrance — inline panel that slides into the page */}
       {showAdd && (
-        <div className="mt-4 rounded-xl border border-cream-200 bg-white p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <label className="text-sm text-brown-mid">Add as:</label>
-            {["own", "tried", "want"].map((s) => (
-              <button
-                key={s}
-                onClick={() => setAddStatus(s)}
-                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
-                  addStatus === s
-                    ? "bg-brown text-cream-50"
-                    : "bg-cream-200 text-brown-mid hover:bg-cream-200"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+        <div className="mt-4 mb-2 rounded-lg border border-cream-200 bg-white px-5 py-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] uppercase tracking-[0.1em] font-medium text-brown-mid">Add as</span>
+              {["own", "tried", "want"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setAddStatus(s)}
+                  className={`rounded px-3 py-1 text-[11px] uppercase tracking-[0.05em] font-medium capitalize transition-colors ${
+                    addStatus === s
+                      ? "bg-brown text-cream-50"
+                      : "bg-cream-100 text-brown-mid hover:bg-cream-200"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1">
+              <SearchBar onSelect={handleAdd} />
+            </div>
           </div>
-          <SearchBar onSelect={handleAdd} />
         </div>
       )}
 
@@ -113,12 +119,30 @@ export default function CollectionPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-cream-200 border-t-brown" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-sm text-brown-mid">
+        <div className="flex flex-col items-center py-20">
+          <div className="flex gap-3 mb-6 opacity-30">
+            <div className="h-20 w-14 rounded bg-cream-200" />
+            <div className="h-24 w-14 rounded bg-cream-200" />
+            <div className="h-20 w-14 rounded bg-cream-200" />
+          </div>
+          <p className="text-[15px] font-medium text-brown-mid">
             {collection.length === 0
-              ? "Your collection is empty"
-              : "No fragrances match this filter."}
+              ? "Start building your collection"
+              : `No fragrances marked as "${filter}"`}
           </p>
+          <p className="text-[13px] text-brown-light mt-1 max-w-[300px] text-center">
+            {collection.length === 0
+              ? "Add fragrances you own, have tried, or want to try. Your collection shapes your taste profile."
+              : "Try a different filter, or add more fragrances above."}
+          </p>
+          {collection.length === 0 && !showAdd && (
+            <button
+              onClick={() => { setAddStatus("own"); setShowAdd(true); }}
+              className="mt-5 text-[12px] uppercase tracking-[0.125em] font-medium py-2.5 px-6 bg-brown rounded text-cream-50 hover:bg-brown-mid transition"
+            >
+              Add Your First
+            </button>
+          )}
         </div>
       ) : filtered.length >= 3 ? (
         <div
@@ -144,8 +168,11 @@ export default function CollectionPage() {
         </div>
       ) : (
         <div
-          className="grid grid-cols-2 gap-2.5"
-          style={{ gridAutoRows: "270px" }}
+          className="grid gap-2.5"
+          style={{
+            gridTemplateColumns: filtered.length === 1 ? "1fr 1fr" : "1fr 1fr",
+            gridAutoRows: "270px",
+          }}
         >
           {filtered.map((item) => (
             <div key={item.fragranceId} className="h-full">
@@ -156,6 +183,17 @@ export default function CollectionPage() {
               />
             </div>
           ))}
+          {filtered.length === 1 && !showAdd && (
+            <button
+              onClick={() => { setAddStatus("own"); setShowAdd(true); }}
+              className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-cream-200 text-brown-light hover:border-brown-light hover:text-brown-mid transition cursor-pointer bg-transparent"
+            >
+              <svg className="h-8 w-8 mb-2 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              <span className="text-[12px] uppercase tracking-[0.125em] font-medium">Add Another</span>
+            </button>
+          )}
         </div>
       )}
     </div>

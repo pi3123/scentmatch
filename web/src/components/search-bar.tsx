@@ -12,7 +12,9 @@ export function SearchBar({
   const [results, setResults] = useState<FragranceResult[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const search = useCallback(async (q: string) => {
@@ -26,6 +28,7 @@ export function SearchBar({
       const data = await res.json();
       setResults(data);
       setOpen(true);
+      setActiveIndex(-1);
     } finally {
       setLoading(false);
     }
@@ -37,11 +40,56 @@ export function SearchBar({
     timerRef.current = setTimeout(() => search(value), 300);
   };
 
+  const handleSelect = (fragrance: FragranceResult) => {
+    onSelect(fragrance);
+    setOpen(false);
+    setQuery(`${fragrance.name} - ${fragrance.brand}`);
+    setActiveIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!open || results.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => {
+        const next = prev < results.length - 1 ? prev + 1 : 0;
+        scrollToItem(next);
+        return next;
+      });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((prev) => {
+        const next = prev > 0 ? prev - 1 : results.length - 1;
+        scrollToItem(next);
+        return next;
+      });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < results.length) {
+        handleSelect(results[activeIndex]);
+      }
+    } else if (e.key === "Escape") {
+      setOpen(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  const scrollToItem = (index: number) => {
+    const list = listRef.current;
+    if (!list) return;
+    const item = list.children[index] as HTMLElement | undefined;
+    if (item) {
+      item.scrollIntoView({ block: "nearest" });
+    }
+  };
+
   // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
+        setActiveIndex(-1);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -66,7 +114,13 @@ export function SearchBar({
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
+          onKeyDown={handleKeyDown}
           placeholder="Search for a fragrance to score..."
+          role="combobox"
+          aria-expanded={open && results.length > 0}
+          aria-activedescendant={activeIndex >= 0 ? `search-option-${activeIndex}` : undefined}
+          aria-autocomplete="list"
+          aria-controls="search-listbox"
           className="w-full rounded-md border border-cream-200 bg-white py-3.5 pl-11 pr-4 text-sm font-normal text-brown shadow-[0_2px_12px_rgba(0,0,0,0.04)] outline-none transition-all placeholder:text-brown-light placeholder:text-[14px] hover:border-brown-light hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] focus:border-brown-light"
         />
         {loading && (
@@ -77,17 +131,21 @@ export function SearchBar({
       </div>
 
       {open && results.length > 0 && (
-        <ul className="absolute z-40 mt-1.5 max-h-72 w-full overflow-y-auto rounded-lg border border-cream-200 bg-white py-1 shadow-lg">
-          {results.map((f) => (
-            <li key={f.id}>
+        <ul
+          ref={listRef}
+          id="search-listbox"
+          role="listbox"
+          className="absolute z-40 mt-1.5 max-h-72 w-full overflow-y-auto rounded-lg border border-cream-200 bg-white py-1 shadow-lg"
+        >
+          {results.map((f, i) => (
+            <li key={f.id} id={`search-option-${i}`} role="option" aria-selected={i === activeIndex}>
               <button
                 type="button"
-                onClick={() => {
-                  onSelect(f);
-                  setOpen(false);
-                  setQuery(`${f.name} - ${f.brand}`);
-                }}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-cream-100"
+                onClick={() => handleSelect(f)}
+                onMouseEnter={() => setActiveIndex(i)}
+                className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                  i === activeIndex ? "bg-cream-100" : "hover:bg-cream-100"
+                }`}
               >
                 {f.imageUrl ? (
                   <img

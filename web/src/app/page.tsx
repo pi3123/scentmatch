@@ -1,48 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SearchBar } from "@/components/search-bar";
 import { MatchResult } from "@/components/match-result";
-import type { FragranceResult, MatchResponse } from "@/types";
+import type { CollectionItem, FragranceResult, MatchResponse } from "@/types";
 
-const bottles = [
-  {
-    name: "Acqua di Gio",
-    src: "https://fimgs.net/mdimg/perfume/375x500.410.jpg",
-    height: 280,
-    delay: "0.3s",
-  },
-  {
-    name: "Tobacco Vanille",
-    src: "https://fimgs.net/mdimg/perfume/375x500.1825.jpg",
-    height: 350,
-    delay: "0.5s",
-  },
-  {
-    name: "Sauvage",
-    src: "https://fimgs.net/mdimg/perfume/375x500.31861.jpg",
-    height: 310,
-    delay: "0.7s",
-  },
-  {
-    name: "Aventus",
-    src: "https://fimgs.net/mdimg/perfume/375x500.9828.jpg",
-    height: 260,
-    delay: "0.9s",
-  },
-];
+interface HeroBottle {
+  name: string;
+  src: string;
+  height: number;
+  delay: string;
+  label?: string;
+}
 
-const stats = [
-  { value: "1,247", label: "Fragrances", delay: "1.1s" },
-  { value: "47", label: "Notes Rated", delay: "1.2s" },
-  { value: "12", label: "In Collection", delay: "1.3s" },
-  { value: "87%", label: "Best Match", delay: "1.4s" },
-];
+const heights = [280, 350, 310, 260, 290, 320];
+const delays = ["0.3s", "0.5s", "0.7s", "0.9s", "1.1s", "1.3s"];
+
+function buildBottles(collection: CollectionItem[]): HeroBottle[] {
+  const withImages = collection.filter((c) => c.fragrance.imageUrl);
+  if (withImages.length === 0) return [];
+
+  return withImages.slice(0, 3).map((item, i) => ({
+    name: item.fragrance.name,
+    src: item.fragrance.imageUrl!,
+    height: heights[i % heights.length],
+    delay: delays[i % delays.length],
+    label: item.status,
+  }));
+}
 
 export default function Home() {
   const [matchResult, setMatchResult] = useState<MatchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bottles, setBottles] = useState<HeroBottle[]>([]);
+  const [bottlesReady, setBottlesReady] = useState(false);
+  const [stats, setStats] = useState([
+    { value: "--", label: "In Database", delay: "1.1s" },
+    { value: "--", label: "Notes Rated", delay: "1.2s" },
+    { value: "--", label: "In Collection", delay: "1.3s" },
+    { value: "--", label: "Taste Profile", delay: "1.4s" },
+  ]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [collRes, prefsRes, statsRes] = await Promise.all([
+        fetch("/api/collection"),
+        fetch("/api/preferences"),
+        fetch("/api/stats"),
+      ]);
+      const collection: CollectionItem[] = collRes.ok ? await collRes.json() : [];
+      const prefs = prefsRes.ok ? await prefsRes.json() : [];
+      const dbStats = statsRes.ok ? await statsRes.json() : { fragranceCount: 0 };
+
+      // Build hero bottles from user's collection only
+      setBottles(buildBottles(collection));
+      setBottlesReady(true);
+
+      const loved = prefs.filter((p: { preference: string }) => p.preference === "love").length;
+      const total = prefs.length;
+      const profileStrength = total === 0 ? "New" : total < 5 ? "Building" : total < 15 ? "Growing" : "Strong";
+
+      setStats([
+        { value: dbStats.fragranceCount.toLocaleString(), label: "In Database", delay: "1.1s" },
+        { value: String(total), label: loved > 0 ? `Notes Rated \u00b7 ${loved} loved` : "Notes Rated", delay: "1.2s" },
+        { value: String(collection.length), label: "In Collection", delay: "1.3s" },
+        { value: profileStrength, label: "Taste Profile", delay: "1.4s" },
+      ]);
+    } catch {
+      setBottlesReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSelect = async (fragrance: FragranceResult) => {
     setLoading(true);
@@ -84,71 +116,91 @@ export default function Home() {
 
   return (
     <div className="pt-[54px]">
-      {/* Hero: two-column split */}
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: "1fr 1.2fr" }}
-      >
-        {/* Left column: text + search */}
-        <div className="flex flex-col justify-center" style={{ padding: "100px 48px 60px 80px" }}>
+      {/* Hero */}
+      {bottlesReady && bottles.length > 0 ? (
+        /* Two-column: text + collection bottles */
+        <div className="grid" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
+          <div className="flex flex-col justify-center" style={{ padding: "100px 48px 60px 80px" }}>
+            <p
+              className="text-[11px] uppercase font-semibold text-brown-light opacity-0 animate-fadeUp"
+              style={{ letterSpacing: "0.25em", animationDelay: "0.2s", animationFillMode: "forwards" }}
+            >
+              BLIND BUY CONFIDENCE
+            </p>
+            <h1
+              className="font-[family-name:var(--font-heading)] text-[64px] font-medium text-brown leading-none tracking-tight opacity-0 animate-fadeUp"
+              style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}
+            >
+              Will you
+              <br />
+              <em className="text-amber">love it?</em>
+            </h1>
+            <p
+              className="text-[15px] text-brown-mid mt-5 max-w-[380px] leading-relaxed opacity-0 animate-fadeUp"
+              style={{ animationDelay: "0.7s", animationFillMode: "forwards" }}
+            >
+              Search any fragrance and we&apos;ll match it against your taste profile.
+              No more guessing, no more regret.
+            </p>
+            <div
+              className="mt-7 opacity-0 animate-fadeUp"
+              style={{ animationDelay: "0.9s", animationFillMode: "forwards" }}
+            >
+              <SearchBar onSelect={handleSelect} />
+            </div>
+          </div>
+          <div className="flex items-center justify-center bg-white" style={{ padding: "80px 24px" }}>
+            {bottles.map((bottle) => (
+              <div
+                key={bottle.name}
+                className="group relative flex flex-col items-center mx-2 opacity-0 animate-bottleUp"
+                style={{ animationDelay: bottle.delay, animationFillMode: "forwards" }}
+              >
+                <div className="transition-transform duration-500 group-hover:-translate-y-3 group-hover:scale-[1.06]" style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
+                  <img
+                    src={bottle.src}
+                    alt={bottle.name}
+                    className="blend object-contain"
+                    style={{ height: `${bottle.height}px` }}
+                  />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-brown px-3 py-1.5 text-[11px] font-medium text-cream-50 opacity-0 transition-opacity group-hover:opacity-100">
+                  {bottle.name}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        /* Full-width hero: no collection yet */
+        <div className="flex flex-col items-center justify-center text-center" style={{ padding: "120px 40px 80px" }}>
           <p
             className="text-[11px] uppercase font-semibold text-brown-light opacity-0 animate-fadeUp"
             style={{ letterSpacing: "0.25em", animationDelay: "0.2s", animationFillMode: "forwards" }}
           >
             BLIND BUY CONFIDENCE
           </p>
-
           <h1
-            className="font-[family-name:var(--font-heading)] text-[64px] font-medium text-brown leading-none tracking-tight opacity-0 animate-fadeUp"
+            className="font-[family-name:var(--font-heading)] text-[72px] font-medium text-brown leading-none tracking-tight opacity-0 animate-fadeUp"
             style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}
           >
-            Will you
-            <br />
-            <em className="text-amber">love it?</em>
+            Will you <em className="text-amber">love it?</em>
           </h1>
-
           <p
-            className="text-[15px] text-brown-mid mt-5 max-w-[380px] leading-relaxed opacity-0 animate-fadeUp"
+            className="text-[16px] text-brown-mid mt-6 max-w-[460px] leading-relaxed opacity-0 animate-fadeUp"
             style={{ animationDelay: "0.7s", animationFillMode: "forwards" }}
           >
-            Search any fragrance and we&apos;ll match it against your taste profile.
-            No more guessing, no more regret.
+            Search any fragrance and we&apos;ll tell you how well it matches your taste.
+            Build your collection, rate notes, and never regret a blind buy again.
           </p>
-
           <div
-            className="mt-7 opacity-0 animate-fadeUp"
+            className="mt-8 w-full max-w-[480px] opacity-0 animate-fadeUp"
             style={{ animationDelay: "0.9s", animationFillMode: "forwards" }}
           >
             <SearchBar onSelect={handleSelect} />
           </div>
         </div>
-
-        {/* Right column: bottles */}
-        <div className="flex items-center justify-center bg-white" style={{ padding: "80px 24px" }}>
-          {bottles.map((bottle) => (
-            <div
-              key={bottle.name}
-              className="group relative flex flex-col items-center mx-2 opacity-0 animate-bottleUp"
-              style={{
-                animationDelay: bottle.delay,
-                animationFillMode: "forwards",
-              }}
-            >
-              <div className="transition-transform duration-500 group-hover:-translate-y-3 group-hover:scale-[1.06]" style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
-                <img
-                  src={bottle.src}
-                  alt={bottle.name}
-                  className="blend object-contain"
-                  style={{ height: `${bottle.height}px` }}
-                />
-              </div>
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-brown px-3 py-1.5 text-[11px] font-medium text-cream-50 opacity-0 transition-opacity group-hover:opacity-100">
-                {bottle.name}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Stats bar */}
       <div className="grid grid-cols-4 bg-white border-t border-cream-200">

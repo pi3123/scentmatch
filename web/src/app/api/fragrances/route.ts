@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { searchAndPersist } from "@/lib/fragella";
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("q");
@@ -22,5 +23,12 @@ export async function GET(request: NextRequest) {
     orderBy: { ratingCount: "desc" },
   });
 
-  return NextResponse.json(fragrances);
+  // If local DB has results, return them
+  if (fragrances.length > 0) {
+    return NextResponse.json(fragrances);
+  }
+
+  // Fallback: search Fragella API and persist for next time
+  const external = await searchAndPersist(query);
+  return NextResponse.json(external);
 }

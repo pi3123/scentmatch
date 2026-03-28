@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { MatchResponse } from "@/types";
 import { ConfidenceBadge } from "./confidence-badge";
 import { NoteTag } from "./note-tag";
@@ -70,6 +71,13 @@ export function MatchResult({
           </span>
           <ConfidenceBadge level={result.confidence} />
         </div>
+
+        <Link
+          href={`/fragrance/${result.fragrance.id}`}
+          className="mb-4 inline-flex items-center gap-1 text-[12px] font-medium text-brown-mid hover:text-brown transition"
+        >
+          View full details &rarr;
+        </Link>
 
         {/* Verdict / explanation */}
         {result.explanation && (

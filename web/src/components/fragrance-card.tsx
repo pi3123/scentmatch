@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { CollectionItem } from "@/types";
 
 function StarRating({ rating }: { rating: number }) {
@@ -41,7 +42,8 @@ export function FragranceCard({
 
   if (featured) {
     return (
-      <div
+      <Link
+        href={`/fragrance/${f.id}`}
         className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-white cursor-pointer transition duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] hover:shadow-[0_12px_40px_rgba(30,24,18,0.08)]"
       >
         <button
@@ -92,13 +94,14 @@ export function FragranceCard({
             </div>
           )}
         </div>
-      </div>
+      </Link>
     );
   }
 
   // Regular card
   return (
-    <div
+    <Link
+      href={`/fragrance/${f.id}`}
       className="group relative flex h-full flex-row overflow-hidden rounded-lg bg-white cursor-pointer transition duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] hover:shadow-[0_12px_40px_rgba(30,24,18,0.08)]"
     >
       <button
@@ -149,6 +152,6 @@ export function FragranceCard({
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
