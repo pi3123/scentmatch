@@ -35,14 +35,14 @@ export async function GET(
     where: { userId },
     select: { fragranceId: true },
   });
-  const excludeIds = [fragranceId, ...collection.map((c) => c.fragranceId)];
+  const excludeIds = [fragranceId, ...collection.map((c: { fragranceId: number }) => c.fragranceId)];
 
   // Get user's note preferences for scoring
   const preferences = await prisma.notePreference.findMany({
     where: { userId },
     include: { note: true },
   });
-  const prefMap = new Map(preferences.map((p) => [p.note.name, p.preference]));
+  const prefMap = new Map(preferences.map((p: { note: { name: string }; preference: string }) => [p.note.name, p.preference]));
 
   // Find fragrances sharing the most notes with target
   let similar = await prisma.fragrance.findMany({
@@ -67,7 +67,7 @@ export async function GET(
         where: { fragranceId },
         select: { noteId: true },
       });
-      const refreshedNoteIds = refreshedTargetNotes.map((n) => n.noteId);
+      const refreshedNoteIds = refreshedTargetNotes.map((n: { noteId: number }) => n.noteId);
 
       // Re-query local DB to pick up newly persisted fragrances
       similar = await prisma.fragrance.findMany({
