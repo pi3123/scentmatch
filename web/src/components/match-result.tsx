@@ -82,7 +82,9 @@ export function MatchResult({
         {/* Verdict / explanation */}
         {result.explanation && (
           <p className="mb-6 rounded-md border-l-[3px] border-amber bg-cream-100 p-4 text-[15px] leading-relaxed text-brown-mid">
-            {result.explanation}
+            {result.explanation.includes("Couldn't generate")
+              ? "Add more fragrances to your collection and rate notes to get personalized match insights."
+              : result.explanation}
           </p>
         )}
 
@@ -93,20 +95,29 @@ export function MatchResult({
             <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.156em] text-brown-mid">
               Note Breakdown
             </h3>
-            <div className="flex flex-wrap gap-1.5">
-              {note_breakdown.loved.map((n) => (
-                <NoteTag key={n} name={n} preference="love" />
-              ))}
-              {note_breakdown.liked.map((n) => (
-                <NoteTag key={n} name={n} preference="like" />
-              ))}
-              {note_breakdown.neutral.map((n) => (
-                <NoteTag key={n} name={n} preference="neutral" />
-              ))}
-              {note_breakdown.disliked.map((n) => (
-                <NoteTag key={n} name={n} preference="dislike" />
-              ))}
-            </div>
+            {note_breakdown.loved.length === 0 &&
+             note_breakdown.liked.length === 0 &&
+             note_breakdown.neutral.length === 0 &&
+             note_breakdown.disliked.length === 0 ? (
+              <p className="text-[12px] text-brown-mid leading-relaxed">
+                Rate some notes in your Taste Profile to see how this fragrance&apos;s notes align with your preferences.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {note_breakdown.loved.map((n) => (
+                  <NoteTag key={n} name={n} preference="love" />
+                ))}
+                {note_breakdown.liked.map((n) => (
+                  <NoteTag key={n} name={n} preference="like" />
+                ))}
+                {note_breakdown.neutral.map((n) => (
+                  <NoteTag key={n} name={n} preference="neutral" />
+                ))}
+                {note_breakdown.disliked.map((n) => (
+                  <NoteTag key={n} name={n} preference="dislike" />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right panel — From Your Collection */}
@@ -142,8 +153,8 @@ export function MatchResult({
                 ))}
               </div>
             ) : (
-              <p className="text-[12px] text-brown-mid">
-                No comparisons available yet.
+              <p className="text-[12px] text-brown-mid leading-relaxed">
+                Add fragrances to your collection to see how this one compares.
               </p>
             )}
           </div>

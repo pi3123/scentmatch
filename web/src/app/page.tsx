@@ -116,8 +116,14 @@ export default function Home() {
 
   return (
     <div className="pt-[54px]">
-      {/* Hero */}
-      {bottlesReady && bottles.length > 0 ? (
+      {/* Hero — compact when match result is showing */}
+      {matchResult && !loading ? (
+        <div className="bg-white py-5 px-8">
+          <div className="w-full max-w-[480px]">
+            <SearchBar onSelect={handleSelect} />
+          </div>
+        </div>
+      ) : bottlesReady && bottles.length > 0 ? (
         /* Two-column: text + collection bottles */
         <div className="grid" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
           <div className="flex flex-col justify-center" style={{ padding: "100px 48px 60px 80px" }}>
