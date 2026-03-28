@@ -1,8 +1,19 @@
-import { PrismaClient } from "@prisma/client";
-import { readFileSync, existsSync } from "fs";
+import { config } from "dotenv";
+import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
 
-const prisma = new PrismaClient();
+// Load .env.local first (matches prisma.config.ts behavior)
+const envLocal = resolve(process.cwd(), ".env.local");
+const envDefault = resolve(process.cwd(), ".env");
+config({ path: existsSync(envLocal) ? envLocal : envDefault, override: true });
+
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+const prisma = new PrismaClient({ adapter });
 
 interface Perfume {
   id: string;
@@ -54,10 +65,7 @@ async function main() {
   }
 
   // Clear existing fragrance data for clean re-seed
-  await prisma.fragranceNote.deleteMany();
-  await prisma.userCollection.deleteMany();
-  await prisma.fragrance.deleteMany();
-  await prisma.note.deleteMany();
+  await prisma.$executeRawUnsafe("TRUNCATE fragrance_notes, user_collection, note_preferences, fragrances, notes CASCADE");
   console.log("Cleared existing fragrance data\n");
 
   let imported = 0;
