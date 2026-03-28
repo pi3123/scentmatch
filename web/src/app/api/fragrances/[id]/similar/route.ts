@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/get-user-id";
-import { findSimilarAndPersist } from "@/lib/fragella";
+import { searchAndPersist } from "@/lib/fragella";
 
 export async function GET(
   request: NextRequest,
@@ -60,7 +60,7 @@ export async function GET(
   // If fewer than 4 local results, supplement with Fragella
   if (similar.length < 4 && targetFragrance?.name) {
     try {
-      await findSimilarAndPersist(targetFragrance.name, 10);
+      await searchAndPersist(targetFragrance.name);
 
       // Re-fetch target notes in case Fragella persisted new data
       const refreshedTargetNotes = await prisma.fragranceNote.findMany({

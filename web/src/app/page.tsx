@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { SearchBar } from "@/components/search-bar";
 import { MatchResult } from "@/components/match-result";
 import type { CollectionItem, FragranceResult, MatchResponse } from "@/types";
+import { Welcome, type OnboardingPath } from "@/components/onboarding/welcome";
+import { OnboardingRateNotes } from "@/components/onboarding/rate-notes";
+import { OnboardingAddCollection } from "@/components/onboarding/add-collection";
+import { SignInPrompt } from "@/components/onboarding/sign-in-prompt";
 
 interface HeroBottle {
   name: string;
@@ -30,6 +34,10 @@ function buildBottles(collection: CollectionItem[]): HeroBottle[] {
 }
 
 export default function Home() {
+  const [onboardingStep, setOnboardingStep] = useState<
+    "loading" | "welcome" | "rate-notes" | "add-collection" | "sign-in" | "done"
+  >("loading");
+  const [onboardingStats, setOnboardingStats] = useState({ rated: 0, added: 0 });
   const [matchResult, setMatchResult] = useState<MatchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,8 +75,17 @@ export default function Home() {
         { value: String(collection.length), label: "In Collection", delay: "1.3s" },
         { value: profileStrength, label: "Taste Profile", delay: "1.4s" },
       ]);
+
+      // Detect if user needs onboarding
+      const hasOnboarded = document.cookie.includes("scentmatch_onboarded=1");
+      if (!hasOnboarded && collection.length === 0 && prefs.length === 0) {
+        setOnboardingStep("welcome");
+      } else {
+        setOnboardingStep("done");
+      }
     } catch {
       setBottlesReady(true);
+      setOnboardingStep("done");
     }
   }, []);
 
@@ -113,6 +130,81 @@ export default function Home() {
       // silently fail for now
     }
   };
+
+  const handleOnboardingComplete = async () => {
+    document.cookie = "scentmatch_onboarded=1;max-age=31536000;path=/";
+    setOnboardingStep("done");
+    // Refresh data and auto-score a popular fragrance
+    await fetchData();
+    try {
+      const popRes = await fetch("/api/fragrances/popular");
+      if (popRes.ok) {
+        const popular = await popRes.json();
+        if (popular.length > 0) {
+          setLoading(true);
+          const matchRes = await fetch("/api/match", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fragranceId: popular[0].id }),
+          });
+          if (matchRes.ok) {
+            setMatchResult(await matchRes.json());
+          }
+          setLoading(false);
+        }
+      }
+    } catch {
+      // Auto-score failed, that's fine
+    }
+  };
+
+  if (onboardingStep === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brown">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cream-200 border-t-brown-light" />
+      </div>
+    );
+  }
+
+  if (onboardingStep === "welcome") {
+    return (
+      <Welcome
+        onSelectPath={(path: OnboardingPath) => setOnboardingStep(path)}
+      />
+    );
+  }
+
+  if (onboardingStep === "rate-notes") {
+    return (
+      <OnboardingRateNotes
+        onDone={() => {
+          setOnboardingStats((s) => ({ ...s, rated: 7 }));
+          setOnboardingStep("sign-in");
+        }}
+      />
+    );
+  }
+
+  if (onboardingStep === "add-collection") {
+    return (
+      <OnboardingAddCollection
+        onDone={() => {
+          setOnboardingStats((s) => ({ ...s, added: 4 }));
+          setOnboardingStep("sign-in");
+        }}
+      />
+    );
+  }
+
+  if (onboardingStep === "sign-in") {
+    return (
+      <SignInPrompt
+        ratedCount={onboardingStats.rated}
+        addedCount={onboardingStats.added}
+        onSkip={handleOnboardingComplete}
+      />
+    );
+  }
 
   return (
     <div className="pt-[54px]">

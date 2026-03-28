@@ -1,0 +1,8 @@
+reviews:
+  auto_review:
+    enabled: true
+    base_branches:
+      - main
+  request_changes_workflow: true
+  auto_approve:
+    enabled: true
